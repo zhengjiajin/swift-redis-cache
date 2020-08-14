@@ -13,7 +13,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.zhengjiajin</groupId>
-			<artifactId>swift-core</artifactId>
+			<artifactId>swift-test</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -30,6 +30,19 @@
 			<groupId>com.alicp.jetcache</groupId>
 			<artifactId>jetcache-redis-springdata</artifactId>
 			<version>2.6.0.M3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>
+						spring-boot-starter-data-redis
+					</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+			<version>${spring-data.version}</version>
 		</dependency>
 	</dependencies>
 </project>
