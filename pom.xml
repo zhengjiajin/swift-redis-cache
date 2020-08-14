@@ -13,7 +13,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.zhengjiajin</groupId>
-			<artifactId>swift-test</artifactId>
+			<artifactId>swift-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
