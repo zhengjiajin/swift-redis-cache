@@ -18,6 +18,7 @@ import com.swift.util.exec.ThreadUtil;
 import com.swift.util.type.TypeUtil;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.params.SetParams;
 
 /**
  * 分布式锁
@@ -58,7 +59,7 @@ public class RedisDisLock {
                 Jedis jedis = redisClientFactory.getJedis();
                 String result = "";
                 try {
-                    result = jedis.set(key, TypeUtil.toString(lockTime), SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME,LOCK_SEC);
+                    result = jedis.set(key, TypeUtil.toString(lockTime),   SetParams.setParams().nx().ex(LOCK_SEC));
                 } finally {
                     redisClientFactory.release(jedis);
                 }

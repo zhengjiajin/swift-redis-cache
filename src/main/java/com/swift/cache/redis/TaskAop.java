@@ -7,6 +7,7 @@ package com.swift.cache.redis;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.SimpleTriggerContext;
@@ -25,8 +27,6 @@ import org.springframework.stereotype.Component;
 import com.swift.util.bean.AnnotationUtil;
 import com.swift.util.date.DateUtil;
 import com.swift.util.type.TypeUtil;
-
-import redis.clients.jedis.Jedis;
 
 /**
  * 添加说明
@@ -42,9 +42,9 @@ public class TaskAop {
     private static final Logger log = LoggerFactory.getLogger(TaskAop.class);
 
     public static final String FILTER_STR = "@annotation(org.springframework.scheduling.annotation.Scheduled) ";
-
+    
     @Autowired
-    private RedisClientFactory redisClientFactory;
+    private RedisTemplate<String,String> redisTemplate;
 
     private static final String REDIS_KEY = "TaskAop:";
 
@@ -99,14 +99,12 @@ public class TaskAop {
 
     private boolean isThisJob(String key, int seconds) {
         boolean isThisJob = false;
-        Jedis jedis = redisClientFactory.getJedis();
-        if(jedis==null) return true;
         if (seconds > 1) seconds = seconds - 1;// 系统处理redis更改操作时间
-        String str = jedis.set(redisKey(key), String.valueOf(seconds), "NX", "EX", seconds);
-        if (TypeUtil.isNotNull(str) && str.equals("OK")) {
+        //String str = jedis.set(redisKey(key), String.valueOf(seconds), "NX", "EX", seconds);
+        Boolean exec = redisTemplate.opsForValue().setIfAbsent(redisKey(key), String.valueOf(seconds), seconds, TimeUnit.SECONDS);
+        if (TypeUtil.isNotNull(exec) && exec) {
             isThisJob = true;
         } 
-        redisClientFactory.release(jedis);
         return isThisJob;
     }
 
